@@ -39,7 +39,7 @@ namespace Shell_In_Csharp
                     List<string> list = new List<string>();
                     while (reader.Read())
                     {
-                        var schema = $"{t}.{reader.GetString(0)}";  // Print schema name
+                        var schema = $"{t}.{reader.GetString(0)}";  
                         list.Add(schema);
                         t++;
                     }
@@ -51,7 +51,7 @@ namespace Shell_In_Csharp
 
         public static List<string> RetrievePostgresFunctions(NpgsqlConnection con)
         {
-            // SQL query to retrieve function names in the 'public' schema
+           
             string query = @"
                 SELECT 
                     p.proname AS function_name
@@ -78,7 +78,7 @@ namespace Shell_In_Csharp
 
         public static void RetrievePostgresProcedures(NpgsqlConnection con)
         {
-            // SQL query to retrieve procedure names in the 'public' schema
+           
             string query = @"
                 SELECT 
                     p.proname AS procedure_name
@@ -109,7 +109,7 @@ namespace Shell_In_Csharp
 
         public static void RetrievePostgresViews(NpgsqlConnection con)
         {
-            // SQL query to retrieve view names in the 'public' schema
+            
             string query = @"
                 SELECT 
                     table_name AS view_name
@@ -134,7 +134,7 @@ namespace Shell_In_Csharp
 
         public static void RetrievePostgresSequences(NpgsqlConnection con)
         {
-            // SQL query to retrieve sequences names in the 'public' schema
+         
             try
             {
                 string query = "SELECT DISTINCT sequencename AS SequenceName FROM pg_sequences";
