@@ -49,7 +49,7 @@ namespace Shell_In_Csharp
             }
         }
 
-        public static void RetrievePostgresFunctions(NpgsqlConnection con)
+        public static List<string> RetrievePostgresFunctions(NpgsqlConnection con)
         {
             // SQL query to retrieve function names in the 'public' schema
             string query = @"
@@ -60,7 +60,7 @@ namespace Shell_In_Csharp
                     WHERE n.nspname = 'public'
                     ORDER BY function_name;
                 ";
-
+            List<string> listFunctions = new List<string>();
             using (var cmd = new NpgsqlCommand(query, con))
             {
                 //con.Open();
@@ -68,11 +68,12 @@ namespace Shell_In_Csharp
                 {
                     while (reader.Read())
                     {
-                        Console.WriteLine($"Function: {reader["function_name"]}");
+                        listFunctions.Add($"Function: {reader["function_name"]}");
                     }
                 }
                 //con.Close();
             }
+            return listFunctions;
         }
 
         public static void RetrievePostgresProcedures(NpgsqlConnection con)
@@ -482,6 +483,102 @@ namespace Shell_In_Csharp
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error creating table: {ex.Message}");
+                }
+            }
+        }
+
+        public static void AddColumn(string tableName,  NpgsqlConnection con)
+        {
+            Console.Write("Enter the column to add (e.g., new_column_name data_type): ");
+            string addColumn = Console.ReadLine();
+            string query = $"ALTER TABLE {tableName} ADD COLUMN {addColumn};";
+            using ( var command = new NpgsqlCommand(query,con))
+            {
+                command.ExecuteNonQuery();
+                Console.WriteLine("Successful");
+            }
+        }
+        
+        public static void ModifyColumn(string tableName,  NpgsqlConnection con)
+        {
+            try
+            {
+                Console.Write("Enter the column to modify (e.g., existing_column_name new_data_type): ");
+                string modifyColumn = Console.ReadLine();
+                string query = $"ALTER TABLE {tableName} ALTER COLUMN {modifyColumn};";
+                using (var command = new NpgsqlCommand(query, con))
+                {
+                    command.ExecuteNonQuery();
+                    Console.WriteLine("Successful");
+                }
+            }
+
+            catch ( Exception ex )
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        public static void DropColumn(string tableName, NpgsqlConnection con)
+        {
+            Console.Write("Enter the column to drop: ");
+            string dropColumn = Console.ReadLine();
+            string query = $"ALTER TABLE {tableName} DROP COLUMN {dropColumn};";
+            using (var command = new NpgsqlCommand(query, con))
+            {
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public static void AlterTable(NpgsqlConnection con)
+        {
+            Console.Write("Enter the name of the table to alter: ");
+            string tableName = Console.ReadLine();
+
+            Console.WriteLine("Choose an operation:");
+            Console.WriteLine("1. Add Column");
+            Console.WriteLine("2. Modify Column");
+            Console.WriteLine("3. Drop Column");
+            Console.Write("Enter your choice (1, 2, or 3): ");
+            string choice = Console.ReadLine();
+
+            string query = string.Empty;
+
+            switch (choice)
+            {
+                case "1":
+                    Console.Write("Enter the column to add (e.g., new_column_name data_type): ");
+                    string addColumn = Console.ReadLine();
+                    query = $"ALTER TABLE {tableName} ADD COLUMN {addColumn};";
+                    break;
+
+                case "2":
+                    Console.Write("Enter the column to modify (e.g., existing_column_name new_data_type): ");
+                    string modifyColumn = Console.ReadLine();
+                    query = $"ALTER TABLE {tableName} ALTER COLUMN {modifyColumn};";
+                    break;
+
+                case "3":
+                    Console.Write("Enter the column to drop: ");
+                    string dropColumn = Console.ReadLine();
+                    query = $"ALTER TABLE {tableName} DROP COLUMN {dropColumn};";
+                    break;
+
+                default:
+                    Console.WriteLine("Invalid choice. Please select 1, 2, or 3.");
+                    return;
+            }
+
+            using (var command = new NpgsqlCommand(query, con))
+            {
+                try
+                {
+                    command.ExecuteNonQuery();
+                    Console.WriteLine($"Altered table '{tableName}' successfully.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error altering table: {ex.Message}");
                 }
             }
         }
