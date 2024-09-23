@@ -1,73 +1,156 @@
-﻿using Npgsql;
-using Shell_In_Csharp;
+﻿using Shell_In_Csharp;
 
 internal class Program
 {
     private static void Main()
     {
-        Console.Write("Enter Host: ");
-        string? host = Console.ReadLine();
-        Console.Write("Enter port: ");
-        string? port = Console.ReadLine();
-        Console.Write("Enter Database: ");
-        string? database = Console.ReadLine();
-        Console.Write("Enter Usename: ");
-        string? username = Console.ReadLine();
-        Console.Write("Enter password: ");
-        string? password = Console.ReadLine();
-        var connection = SchemaMenu.ConnectToDatabase(host, port, database, username, password);
-
-        using (var conn = connection)
+        bool exit = false; 
+        while (!exit)
         {
-            Console.WriteLine("Successfully connected to database");
-            Console.ReadLine();
-            ArrowIndex(new List<string> { "Schemas" }, " ");
-            //int key = ArrowIndex(ShowSchemas(conn), "Schemas");
+
+            Console.Write("Enter Host: ");
+            string? host = Console.ReadLine();
+            Console.Write("Enter port: ");
+            string? port = Console.ReadLine();
+            Console.Write("Enter Database: ");
+            string? database = Console.ReadLine();
+            Console.Write("Enter Username: ");
+            string? username = Console.ReadLine();
+            Console.Write("Enter password: ");
+            string? password = Console.ReadLine();
+            var connection = SchemaMenu.ConnectToDatabase(host, port, database, username, password);
+
+            using (var conn = connection)
+            {
+                conn.Open();
+                Console.WriteLine("Successfully connected to database");
+                Console.ReadLine();
+                ArrowIndex(new List<string> { "Schemas" }, " ");
 
             schema:
-            List<string> list1 = new List<string>()
+                List<string> list1 = new List<string>()
             {
                 "\t\t1.Functions",
                 "\t\t2.Procedures",
                 "\t\t3.Tables",
                 "\t\t4.Views",
                 "\t\t5.Sequences",
-                "\t\t6.Back"
+                "\t\t6.Enter query",
+                "\t\t7.Back"
 
             };
 
-            int index = ArrowIndex(list1, " ");
-
-            switch (index)
+                List<string> tablesProperty = new List<string>()
             {
-                case 0:
-                    SchemaMenu.RetrievePostgresFunctions(conn);
-                    Console.ReadLine();
-                    goto schema;
-                    break;
-                case 1:
-                    SchemaMenu.RetrievePostgresFunctions(conn);
-                    Console.ReadLine();
-                    goto schema;
-                    break;
-                case 2:
-                    SchemaMenu.DatabaseTables(conn);
-                    Console.ReadLine();
-                    goto schema;
-                    break;
-                case 3:
-                    SchemaMenu.RetrievePostgresViews(conn);
-                    Console.ReadLine();
-                    goto schema;
-                    break;
-                case 4:
-                    break;
+                "Columns",
+                "Insert",
+                "Select",
+                "Update",
+                "Delete",
+                "Back"
+            };
+
+                int index = ArrowIndex(list1, " ");
+
+                switch (index)
+                {
+                    case 0:
+                        SchemaMenu.RetrievePostgresFunctions(conn);
+                        Console.ReadLine();
+                        goto schema;
+                    case 1:
+                        SchemaMenu.RetrievePostgresProcedures(conn);
+                        Console.ReadLine();
+                        goto schema;
+                    case 2:
+                        List<string> TableStrings = new List<string>()
+                    {
+                        "Create table",
+                        "Select table",
+                        "Back"
+                    };
+                        int IndexTable = ArrowIndex(TableStrings, " ");
+                        switch (IndexTable)
+                        {
+                            case 0:
+                                SchemaMenu.CreateTable(conn);
+                                Console.ReadLine();
+                                goto schema;
+                                break;
+                            case 1:
+                                List<string> tables = SchemaMenu.DatabaseTables(conn);
+                                int keyTables = ArrowIndex(tables, " ");
+                                string selectedTable = tables[keyTables];
+                            tables:
+                                int key = ArrowIndex(tablesProperty, " ");
+
+                                switch (key)
+                                {
+                                    case 0:
+                                        List<string> columns = SchemaMenu.GetTableColumns1(selectedTable, conn);
+                                        ArrowIndex(columns, "Columns");
+                                        Console.ReadLine();
+                                        goto tables;
+                                    case 1:
+                                        SchemaMenu.InsertData(conn, selectedTable);
+                                        Console.ReadLine();
+                                        goto tables;
+                                        break;
+                                    case 2:
+                                        //select
+                                        SchemaMenu.SelectQuery(selectedTable, conn);
+                                        Console.ReadLine();
+                                        goto tables;
+                                        break;
+                                    case 3:
+                                        SchemaMenu.UpdateData(conn, selectedTable);
+                                        Console.ReadLine();
+                                        goto tables;
+                                        //update
+                                        break;
+                                    case 4:
+                                        Console.Write("Enter the WHERE clause for deletion (e.g., id = 1): ");
+                                        string whereClause = Console.ReadLine();
+                                        SchemaMenu.DeleteQuery(selectedTable, whereClause, conn);
+                                        Console.ReadLine();
+                                        goto tables;
+                                        //delete
+                                        break;
+                                    case 5:
+                                        goto schema;
+                                }
+                                Console.ReadLine();
+                                break;
+
+                            case 3:
+                                goto schema;
+
+                        }
+                        break;
+                    case 3:
+                        SchemaMenu.RetrievePostgresViews(conn);
+                        Console.ReadLine();
+                        goto schema;
+                    case 4:
+                        SchemaMenu.RetrievePostgresSequences(conn);
+                        Console.ReadLine();
+                        goto schema;
+                    case 5:
+                        Console.WriteLine("Enter query: ");
+                        string query = Console.ReadLine();
+                        SchemaMenu.QueryTool(query, conn);
+                        Console.ReadLine();
+                        break;
+                    case 6:
+                        exit = true;
+                        break;
+                }
             }
         }
     }
 
-    
-    
+
+
     public static int ArrowIndex(List<string> list, string name)
     {
         int selectIndex = 0;
