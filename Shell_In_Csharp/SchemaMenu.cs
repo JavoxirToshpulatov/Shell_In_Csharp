@@ -27,27 +27,7 @@ namespace Shell_In_Csharp
             return con;
         }
 
-        public static List<string> ShowSchemas(NpgsqlConnection conn)
-        {
-           // conn.Open();
-
-            using (var cmd = new NpgsqlCommand("SELECT nspname AS schema_name FROM pg_namespace WHERE nspname NOT IN ('information_schema', 'pg_catalog', 'pg_toast') ORDER BY nspname;", conn))
-            {
-                using (var reader = cmd.ExecuteReader())
-                {
-                    int t = 1;
-                    List<string> list = new List<string>();
-                    while (reader.Read())
-                    {
-                        var schema = $"{t}.{reader.GetString(0)}";  
-                        list.Add(schema);
-                        t++;
-                    }
-                    list.Add($"{t}.Back");
-                    return list;
-                }
-            }
-        }
+        
 
         public static List<string> RetrievePostgresFunctions(NpgsqlConnection con)
         {
@@ -143,10 +123,13 @@ namespace Shell_In_Csharp
                 {
                     using (var reader = cmd.ExecuteReader())
                     {
+                        int t = 0;
                         while (reader.Read())
                         {
                             Console.WriteLine($"Sequence Name: {reader["SequenceName"]}");
+                            t++;
                         }
+                        if (t == 1) Console.WriteLine("No sequences yet");
                     }
                 }
             }
@@ -157,16 +140,7 @@ namespace Shell_In_Csharp
             }
         }
 
-        public static void GetTableColumns(string tableName, NpgsqlConnection con)
-        {
-           // con.Open();
-            var item = con.GetSchema("Columns", new string[] { null, null, tableName });
-
-            foreach (DataRow column in item.Rows)
-            {
-                Console.WriteLine(column["COLUMN_NAME"]);
-            }
-        }
+        
 
         public static void QueryTool (string query, NpgsqlConnection con)
         {
@@ -201,7 +175,7 @@ namespace Shell_In_Csharp
             }
         }
 
-        public static List<string> GetTableColumns1(string tableName, NpgsqlConnection con)
+        public static List<string> GetTableColumns(string tableName, NpgsqlConnection con)
         {
             var columns = new List<string>();
             var item = con.GetSchema("Columns", new string[] { null, null, tableName });
@@ -217,7 +191,7 @@ namespace Shell_In_Csharp
         public static void InsertData(NpgsqlConnection con, string tableName)
         {
             // Get column names for the specified table
-            var columns = GetTableColumns1(tableName, con);
+            var columns = GetTableColumns(tableName, con);
             var columnValues = new Dictionary<string, object>();
 
             Console.WriteLine($"Insert data into table: {tableName}");
@@ -529,59 +503,5 @@ namespace Shell_In_Csharp
                 command.ExecuteNonQuery();
             }
         }
-
-        public static void AlterTable(NpgsqlConnection con)
-        {
-            Console.Write("Enter the name of the table to alter: ");
-            string tableName = Console.ReadLine();
-
-            Console.WriteLine("Choose an operation:");
-            Console.WriteLine("1. Add Column");
-            Console.WriteLine("2. Modify Column");
-            Console.WriteLine("3. Drop Column");
-            Console.Write("Enter your choice (1, 2, or 3): ");
-            string choice = Console.ReadLine();
-
-            string query = string.Empty;
-
-            switch (choice)
-            {
-                case "1":
-                    Console.Write("Enter the column to add (e.g., new_column_name data_type): ");
-                    string addColumn = Console.ReadLine();
-                    query = $"ALTER TABLE {tableName} ADD COLUMN {addColumn};";
-                    break;
-
-                case "2":
-                    Console.Write("Enter the column to modify (e.g., existing_column_name new_data_type): ");
-                    string modifyColumn = Console.ReadLine();
-                    query = $"ALTER TABLE {tableName} ALTER COLUMN {modifyColumn};";
-                    break;
-
-                case "3":
-                    Console.Write("Enter the column to drop: ");
-                    string dropColumn = Console.ReadLine();
-                    query = $"ALTER TABLE {tableName} DROP COLUMN {dropColumn};";
-                    break;
-
-                default:
-                    Console.WriteLine("Invalid choice. Please select 1, 2, or 3.");
-                    return;
-            }
-
-            using (var command = new NpgsqlCommand(query, con))
-            {
-                try
-                {
-                    command.ExecuteNonQuery();
-                    Console.WriteLine($"Altered table '{tableName}' successfully.");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error altering table: {ex.Message}");
-                }
-            }
-        }
-
     }
 }

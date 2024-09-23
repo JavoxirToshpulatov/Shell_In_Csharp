@@ -101,7 +101,6 @@ internal class Program
                                     SchemaMenu.CreateTable(conn);
                                     Console.ReadLine();
                                     goto schema;
-                                    break;
                                 case 1:
                                     List<string> tables = SchemaMenu.DatabaseTables(conn);
                                     int keyTables = ArrowIndex(tables, " ");
@@ -112,7 +111,7 @@ internal class Program
                                     switch (key)
                                     {
                                         case 0:
-                                            List<string> columns = SchemaMenu.GetTableColumns1(selectedTable, conn);
+                                            List<string> columns = SchemaMenu.GetTableColumns(selectedTable, conn);
                                             ArrowIndex(columns, "Columns");
                                             Console.ReadLine();
                                             goto tables;
@@ -126,13 +125,11 @@ internal class Program
                                             SchemaMenu.SelectQuery(selectedTable, conn);
                                             Console.ReadLine();
                                             goto tables;
-                                            break;
                                         case 3:
                                             SchemaMenu.UpdateData(conn, selectedTable);
                                             Console.ReadLine();
                                             goto tables;
                                             //update
-                                            break;
                                         case 4:
                                             Console.Write("Enter the WHERE clause for deletion (e.g., id = 1): ");
                                             string whereClause = Console.ReadLine();
@@ -140,7 +137,6 @@ internal class Program
                                             Console.ReadLine();
                                             goto tables;
                                             //delete
-                                            break;
                                         case 5:
                                             SchemaMenu.AddColumn(selectedTable, conn);
                                             Console.ReadLine();
