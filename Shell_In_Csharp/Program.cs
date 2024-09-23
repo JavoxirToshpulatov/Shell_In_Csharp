@@ -55,8 +55,7 @@ internal class Program
                 "\t\t3.Tables",
                 "\t\t4.Views",
                 "\t\t5.Sequences",
-                "\t\t6.Enter query",
-                "\t\t7.Back"
+                "\t\t6.Back"
 
             };
 
@@ -119,7 +118,6 @@ internal class Program
                                             SchemaMenu.InsertData(conn, selectedTable);
                                             Console.ReadLine();
                                             goto tables;
-                                            break;
                                         case 2:
                                             //select
                                             SchemaMenu.SelectQuery(selectedTable, conn);
@@ -168,12 +166,6 @@ internal class Program
                             Console.ReadLine();
                             goto schema;
                         case 5:
-                            Console.WriteLine("Enter query: ");
-                            string query = Console.ReadLine();
-                            SchemaMenu.QueryTool(query, conn);
-                            Console.ReadLine();
-                            break;
-                        case 6:
                             exit = true;
                             break;
                     }

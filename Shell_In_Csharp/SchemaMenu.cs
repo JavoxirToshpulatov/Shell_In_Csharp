@@ -27,8 +27,6 @@ namespace Shell_In_Csharp
             return con;
         }
 
-        
-
         public static List<string> RetrievePostgresFunctions(NpgsqlConnection con)
         {
            
@@ -114,7 +112,6 @@ namespace Shell_In_Csharp
 
         public static void RetrievePostgresSequences(NpgsqlConnection con)
         {
-         
             try
             {
                 string query = "SELECT DISTINCT sequencename AS SequenceName FROM pg_sequences";
@@ -129,7 +126,7 @@ namespace Shell_In_Csharp
                             Console.WriteLine($"Sequence Name: {reader["SequenceName"]}");
                             t++;
                         }
-                        if (t == 1) Console.WriteLine("No sequences yet");
+                        if (t == 0) Console.WriteLine("No sequences yet");
                     }
                 }
             }
@@ -138,23 +135,6 @@ namespace Shell_In_Csharp
             {
                 Console.WriteLine(ex.Message);
             }
-        }
-
-        
-
-        public static void QueryTool (string query, NpgsqlConnection con)
-        {
-            try
-            {
-                NpgsqlCommand npgsqlCommand = new NpgsqlCommand(query, con);
-                npgsqlCommand.ExecuteNonQuery();
-                Console.WriteLine("Succesfully ");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
         }
 
         public static void InsertQuery(string tableName, Dictionary<string, object> columnValues, NpgsqlConnection con)
