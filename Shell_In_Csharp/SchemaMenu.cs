@@ -5,31 +5,31 @@ namespace Shell_In_Csharp
 {
     public static class SchemaMenu
     {
-        public static List<string> DatabaseTables(NpgsqlConnection con)
-        {
-            //con.Open();
-            List<string> tables = new List<string>();
-           
-                var Schemas = con.GetSchema("Tables");
-                foreach (DataRow schema in Schemas.Rows)
-                {
-                    var table_name = (string)(schema["TABLE_NAME"]);
-                    tables.Add(table_name);
-                }
-            //con.Close();
-            return tables;
-        }
-
         public static NpgsqlConnection ConnectToDatabase(string host, string port, string database, string Username, string password)
         {
             string connectionString = $"Host={host}; port={port};Database={database}; User Id={Username}; Password={password}";
             NpgsqlConnection con = new NpgsqlConnection(connectionString);
             return con;
         }
+        public static List<string> DatabaseTables(NpgsqlConnection con)
+        {
+            //con.Open();
+            List<string> tables = new List<string>();
+            var Schemas = con.GetSchema("Tables");
+            
+            foreach (DataRow schema in Schemas.Rows)
+            {
+                var table_name = (string)(schema["TABLE_NAME"]);
+                tables.Add(table_name);
+            }
+
+            return tables;
+        }
+
 
         public static List<string> RetrievePostgresFunctions(NpgsqlConnection con)
         {
-           
+
             string query = @"
                 SELECT 
                     p.proname AS function_name
@@ -56,7 +56,7 @@ namespace Shell_In_Csharp
 
         public static void RetrievePostgresProcedures(NpgsqlConnection con)
         {
-           
+
             string query = @"
                 SELECT 
                     p.proname AS procedure_name
@@ -87,7 +87,7 @@ namespace Shell_In_Csharp
 
         public static void RetrievePostgresViews(NpgsqlConnection con)
         {
-            
+
             string query = @"
                 SELECT 
                     table_name AS view_name
@@ -101,10 +101,13 @@ namespace Shell_In_Csharp
                 //con.Open();
                 using (var reader = cmd.ExecuteReader())
                 {
+                    int t = 0;
                     while (reader.Read())
                     {
                         Console.WriteLine($"View: {reader["view_name"]}");
+                        t++;
                     }
+                    if (t == 0) Console.WriteLine("No views yet");
                 }
                 //con.Close();
             }
@@ -266,19 +269,17 @@ namespace Shell_In_Csharp
 
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        Console.Write($"{reader.GetName(i),-30}"); // Left-align with a width of 20
+                        Console.Write($"{reader.GetName(i),-30}"); 
                     }
                     Console.WriteLine();
 
-                    // Print a separator
                     Console.WriteLine(new string('-', 30 * reader.FieldCount));
 
-                    // Read the data and display it
                     while (reader.Read())
                     {
                         for (int i = 0; i < reader.FieldCount; i++)
                         {
-                            Console.Write($"{reader[i],-30}"); // Left-align with a width of 20
+                            Console.Write($"{reader[i],-30}"); 
                         }
                         Console.WriteLine();
                     }
@@ -288,11 +289,9 @@ namespace Shell_In_Csharp
 
         public static void UpdateData(NpgsqlConnection con, string tableName)
         {
-            // Prompt user for the WHERE clause
             Console.Write("Enter the WHERE clause (e.g., id = 1): ");
             string whereClause = Console.ReadLine();
 
-            // Get current row data based on the provided WHERE clause
             var currentData = GetCurrentData(tableName, con, whereClause);
 
             if (currentData == null || currentData.Count == 0)
@@ -301,7 +300,6 @@ namespace Shell_In_Csharp
                 return;
             }
 
-            // Display current data
             Console.WriteLine("Current Data:");
             foreach (var kvp in currentData)
             {
@@ -310,13 +308,11 @@ namespace Shell_In_Csharp
 
             var columnValues = new Dictionary<string, object>();
 
-            // Prompt for new values
             foreach (var kvp in currentData)
             {
                 Console.Write($"Enter new value for {kvp.Key} (leave blank to keep current value): ");
                 string input = Console.ReadLine();
 
-                // If input is not empty, convert and update the value
                 if (!string.IsNullOrEmpty(input))
                 {
                     if (kvp.Key == "state_id") // Example for smallint
@@ -441,19 +437,19 @@ namespace Shell_In_Csharp
             }
         }
 
-        public static void AddColumn(string tableName,  NpgsqlConnection con)
+        public static void AddColumn(string tableName, NpgsqlConnection con)
         {
             Console.Write("Enter the column to add (e.g., new_column_name data_type): ");
             string addColumn = Console.ReadLine();
             string query = $"ALTER TABLE {tableName} ADD COLUMN {addColumn};";
-            using ( var command = new NpgsqlCommand(query,con))
+            using (var command = new NpgsqlCommand(query, con))
             {
                 command.ExecuteNonQuery();
                 Console.WriteLine("Successful");
             }
         }
-        
-        public static void ModifyColumn(string tableName,  NpgsqlConnection con)
+
+        public static void ModifyColumn(string tableName, NpgsqlConnection con)
         {
             try
             {
@@ -467,7 +463,7 @@ namespace Shell_In_Csharp
                 }
             }
 
-            catch ( Exception ex )
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }

@@ -79,6 +79,12 @@ internal class Program
                     {
                         case 0:
                             List<string> listFunctions = SchemaMenu.RetrievePostgresFunctions(conn);
+                            if (listFunctions.Count == 0)
+                            {
+                                Console.WriteLine("No functions yet");
+                                Console.ReadLine();
+                                goto schema;
+                            }
                             int function = ArrowIndex(listFunctions, " ");
                             Console.ReadLine();
                             goto schema;
@@ -102,6 +108,12 @@ internal class Program
                                     goto schema;
                                 case 1:
                                     List<string> tables = SchemaMenu.DatabaseTables(conn);
+                                    if (tables.Count == 0)
+                                    {
+                                        Console.WriteLine("No Tables yet");
+                                        Console.ReadLine();
+                                        goto schema;
+                                    }
                                     int keyTables = ArrowIndex(tables, " ");
                                     string selectedTable = tables[keyTables];
                                 tables:
