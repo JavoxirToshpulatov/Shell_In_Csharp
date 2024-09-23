@@ -11,9 +11,9 @@ namespace Shell_In_Csharp
             NpgsqlConnection con = new NpgsqlConnection(connectionString);
             return con;
         }
+
         public static List<string> DatabaseTables(NpgsqlConnection con)
         {
-            //con.Open();
             List<string> tables = new List<string>();
             var Schemas = con.GetSchema("Tables");
             
@@ -22,14 +22,11 @@ namespace Shell_In_Csharp
                 var table_name = (string)(schema["TABLE_NAME"]);
                 tables.Add(table_name);
             }
-
             return tables;
         }
 
-
         public static List<string> RetrievePostgresFunctions(NpgsqlConnection con)
         {
-
             string query = @"
                 SELECT 
                     p.proname AS function_name
@@ -41,7 +38,6 @@ namespace Shell_In_Csharp
             List<string> listFunctions = new List<string>();
             using (var cmd = new NpgsqlCommand(query, con))
             {
-                //con.Open();
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -49,7 +45,6 @@ namespace Shell_In_Csharp
                         listFunctions.Add($"Function: {reader["function_name"]}");
                     }
                 }
-                //con.Close();
             }
             return listFunctions;
         }
@@ -69,7 +64,6 @@ namespace Shell_In_Csharp
 
             using (var cmd = new NpgsqlCommand(query, con))
             {
-                //con.Open();
                 using (var reader = cmd.ExecuteReader())
                 {
                     int t = 0;
@@ -81,13 +75,11 @@ namespace Shell_In_Csharp
                     if (t == 0)
                         Console.WriteLine("There are not procedures yet");
                 }
-                //con.Close();
             }
         }
 
         public static void RetrievePostgresViews(NpgsqlConnection con)
         {
-
             string query = @"
                 SELECT 
                     table_name AS view_name
@@ -291,7 +283,6 @@ namespace Shell_In_Csharp
         {
             Console.Write("Enter the WHERE clause (e.g., id = 1): ");
             string whereClause = Console.ReadLine();
-
             var currentData = GetCurrentData(tableName, con, whereClause);
 
             if (currentData == null || currentData.Count == 0)
