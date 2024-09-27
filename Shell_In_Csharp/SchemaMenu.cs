@@ -5,24 +5,33 @@ namespace Shell_In_Csharp
 {
     public static class SchemaMenu
     {
-        public static NpgsqlConnection ConnectToDatabase(string host, string port, string database, string Username, string password)
+        public static List<string> Databases (NpgsqlConnection con) 
         {
-            string connectionString = $"Host={host}; port={port};Database={database}; User Id={Username}; Password={password}";
+            List<string> result = new List<string>();
+            NpgsqlCommand cmd = new NpgsqlCommand("SELECT datname FROM pg_database WHERE datistemplate = false;", con);
+            var databases = cmd.ExecuteReader();
+
+            while (databases.Read())
+                result.Add(databases.GetString(0));
+            result.Add("Back to Host");
+            return result;
+        }
+
+        public static NpgsqlConnection ConnectToServer(string host, string port,  string Username, string password)
+        {
+            string connectionString = $"Host={host}; port={port}; User Id={Username}; Password={password}";
             NpgsqlConnection con = new NpgsqlConnection(connectionString);
+            con.Open();
             return con;
         }
 
-        public static List<string> DatabaseTables(NpgsqlConnection con)
+        public static NpgsqlConnection ConnectToDatabase(string host, string port, string Username, string password, string database)
         {
-            List<string> tables = new List<string>();
-            var Schemas = con.GetSchema("Tables");
-            
-            foreach (DataRow schema in Schemas.Rows)
-            {
-                var table_name = (string)(schema["TABLE_NAME"]);
-                tables.Add(table_name);
-            }
-            return tables;
+            string connectionString = $"Host={host}; port={port}; Database={database}; User Id={Username}; Password={password}";
+
+            NpgsqlConnection newConnection = new NpgsqlConnection(connectionString);
+            newConnection.Open();
+            return newConnection;
         }
 
         public static List<string> RetrievePostgresFunctions(NpgsqlConnection con)
