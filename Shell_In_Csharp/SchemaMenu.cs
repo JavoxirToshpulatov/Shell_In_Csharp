@@ -5,6 +5,53 @@ namespace Shell_In_Csharp
 {
     public static class SchemaMenu
     {
+        public static void MainFeatures(NpgsqlConnection connection1)
+        {
+            List<string> list1 = new List<string>()
+                {
+                    "\t\t1.Functions",
+                    "\t\t2.Procedures",
+                    "\t\t3.Tables",
+                    "\t\t4.Views",
+                    "\t\t5.Sequences",
+                    "\t\t6.Back"
+                };
+            Features:
+            int index = Program.ArrowIndex(list1, " ");
+
+            switch (index)
+            {
+                case 0:
+                    List<string> listFunctions = SchemaMenu.RetrievePostgresFunctions(connection1);
+                    if (listFunctions.Count == 0)
+                    {
+                        Console.WriteLine("No functions yet");
+                        Console.ReadLine();
+                        goto Features;
+                    }
+                    int function = Program.ArrowIndex(listFunctions, " ");
+                    goto Features;
+                case 1:
+                    SchemaMenu.RetrievePostgresProcedures(connection1);
+                    Console.ReadLine();
+                    goto Features;
+                case 2:
+                    Tables.TablesMenu(connection1);
+                    break;
+                case 3:
+                    SchemaMenu.RetrievePostgresViews(connection1);
+                    Console.ReadLine();
+                    goto Features;
+                case 4:
+                    SchemaMenu.RetrievePostgresSequences(connection1);
+                    Console.ReadLine();
+                    goto Features;
+                case 5:
+                    Databases(connection1);
+                    break;
+            }
+        }
+
         public static List<string> Databases (NpgsqlConnection con) 
         {
             List<string> result = new List<string>();
