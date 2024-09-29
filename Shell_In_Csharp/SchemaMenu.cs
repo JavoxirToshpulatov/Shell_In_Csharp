@@ -5,24 +5,81 @@ namespace Shell_In_Csharp
 {
     public static class SchemaMenu
     {
-        public static NpgsqlConnection ConnectToDatabase(string host, string port, string database, string Username, string password)
+        public static void MainFeatures(NpgsqlConnection connection1)
         {
-            string connectionString = $"Host={host}; port={port};Database={database}; User Id={Username}; Password={password}";
+            List<string> list1 = new List<string>()
+                {
+                    "\t\t1.Functions",
+                    "\t\t2.Procedures",
+                    "\t\t3.Tables",
+                    "\t\t4.Views",
+                    "\t\t5.Sequences",
+                    "\t\t6.Back"
+                };
+            Features:
+            int index = Program.ArrowIndex(list1, " ");
+
+            switch (index)
+            {
+                case 0:
+                    List<string> listFunctions = SchemaMenu.RetrievePostgresFunctions(connection1);
+                    if (listFunctions.Count == 0)
+                    {
+                        Console.WriteLine("No functions yet");
+                        Console.ReadLine();
+                        goto Features;
+                    }
+                    int function = Program.ArrowIndex(listFunctions, " ");
+                    goto Features;
+                case 1:
+                    SchemaMenu.RetrievePostgresProcedures(connection1);
+                    Console.ReadLine();
+                    goto Features;
+                case 2:
+                    Tables.TablesMenu(connection1);
+                    break;
+                case 3:
+                    SchemaMenu.RetrievePostgresViews(connection1);
+                    Console.ReadLine();
+                    goto Features;
+                case 4:
+                    SchemaMenu.RetrievePostgresSequences(connection1);
+                    Console.ReadLine();
+                    goto Features;
+                case 5:
+                    Databases(connection1);
+                    break;
+            }
+        }
+
+        public static List<string> Databases (NpgsqlConnection con) 
+        {
+            List<string> result = new List<string>();
+            NpgsqlCommand cmd = new NpgsqlCommand("SELECT datname FROM pg_database WHERE datistemplate = false;", con);
+            var databases = cmd.ExecuteReader();
+
+            while (databases.Read())
+                result.Add(databases.GetString(0));
+            result.Add("Back to Host");
+            return result;
+            //demo
+        }
+
+        public static NpgsqlConnection ConnectToServer(string host, string port,  string Username, string password)
+        {
+            string connectionString = $"Host={host}; port={port}; User Id={Username}; Password={password}";
             NpgsqlConnection con = new NpgsqlConnection(connectionString);
+            con.Open();
             return con;
         }
 
-        public static List<string> DatabaseTables(NpgsqlConnection con)
+        public static NpgsqlConnection ConnectToDatabase(string host, string port, string Username, string password, string database)
         {
-            List<string> tables = new List<string>();
-            var Schemas = con.GetSchema("Tables");
-            
-            foreach (DataRow schema in Schemas.Rows)
-            {
-                var table_name = (string)(schema["TABLE_NAME"]);
-                tables.Add(table_name);
-            }
-            return tables;
+            string connectionString = $"Host={host}; port={port}; Database={database}; User Id={Username}; Password={password}";
+
+            NpgsqlConnection newConnection = new NpgsqlConnection(connectionString);
+            newConnection.Open();
+            return newConnection;
         }
 
         public static List<string> RetrievePostgresFunctions(NpgsqlConnection con)
