@@ -62,6 +62,7 @@ namespace Shell_In_Csharp
                 result.Add(databases.GetString(0));
             result.Add("Back to Host");
             return result;
+            //demo
         }
 
         public static NpgsqlConnection ConnectToServer(string host, string port,  string Username, string password)
