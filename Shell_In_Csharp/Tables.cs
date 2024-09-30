@@ -23,11 +23,6 @@ namespace Shell_In_Csharp
             return tables;
         }
 
-        public static void AsosiyMenu()
-        {
-            
-        }
-
         public static void TablesMenu (NpgsqlConnection connection1)
         {
             schema:
@@ -74,28 +69,28 @@ namespace Shell_In_Csharp
                     switch (key)
                     {
                         case 0:
-                            List<string> columns = SchemaMenu.GetTableColumns(selectedTable, connection1);
+                            List<string> columns = CRUDOperations.GetTableColumns(selectedTable, connection1);
                             Program.ArrowIndex(columns, "Columns");
                             Console.ReadLine();
                             goto tables;
                         case 1:
-                            SchemaMenu.InsertData(connection1, selectedTable);
+                            CRUDOperations.InsertData(connection1, selectedTable);
                             Console.ReadLine();
                             goto tables;
                         case 2:
                             //select
-                            SchemaMenu.SelectQuery(selectedTable, connection1);
+                            CRUDOperations.SelectQuery(selectedTable, connection1);
                             Console.ReadLine();
                             goto tables;
                         case 3:
-                            SchemaMenu.UpdateData(connection1, selectedTable);
+                            CRUDOperations.UpdateData(connection1, selectedTable);
                             Console.ReadLine();
                             goto tables;
                         //update
                         case 4:
                             Console.Write("Enter the WHERE clause for deletion (e.g., id = 1): ");
                             string whereClause = Console.ReadLine();
-                            SchemaMenu.DeleteQuery(selectedTable, whereClause, connection1);
+                            CRUDOperations.DeleteQuery(selectedTable, whereClause, connection1);
                             Console.ReadLine();
                             goto tables;
                         //delete
