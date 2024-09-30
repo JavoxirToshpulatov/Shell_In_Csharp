@@ -37,13 +37,13 @@ internal class Program
 
             password:
             Console.Write("Enter password: ");
-            string? password = Console.ReadLine();
+            string? password = SchemaMenu.ReadPassword();
             if (string.IsNullOrEmpty(password))
             {
                 Console.WriteLine("Password cannot be empty");
                 goto password;
             }
-
+            Console.WriteLine("");
             while (!exit)
             {
                 try
