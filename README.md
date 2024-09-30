@@ -1,0 +1,1 @@
+this application work like pgAdmin4 or SQL shell. you can connect any host, with ports, username and password. then  you can  choose database in this host. with database, you can CRUD operations. Furthermore, you can see functions, procedures , views and so on. 
